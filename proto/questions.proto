@@ -1,0 +1,170 @@
+
+syntax = "proto3";
+
+package proto;
+
+import "google/protobuf/any.proto";
+
+/** 
+ * User
+ */
+message User{
+  int32 id = 1;
+  string name = 2;
+}
+
+/**
+ * Login Request Message
+ */
+message LoginRequest {
+  int32 id = 1;
+  string word = 2;
+}
+
+/**
+ * Login Reply
+ */
+message LoginReply {
+  User user = 1;
+}
+
+/**
+ * Problem
+ */
+message Problem{
+  int32 id = 1;
+  optional int32 group_id = 5;
+  string question = 2;
+  string category = 3;
+
+  /** 
+  * SelectionProblem
+  */
+  message SelectionProblem {
+    map<int32, string> choices = 2;
+    int32 answer = 3;
+  }
+
+  /**
+  * DescriptionProblem
+  */
+  message DescriptionProblem {
+    string answer = 1;
+  }
+
+  /**
+  * Word Problem
+  */
+  message WordProblem{
+    string target_word = 1;
+    string word_mean = 2;
+  }
+
+  oneof problem {
+    SelectionProblem selection_problem = 10;
+    DescriptionProblem description_problem = 11;
+    WordProblem word_problem = 12;
+  }
+}
+
+
+/**
+ * List of problem
+ */
+message Problems{
+  repeated Problem problems = 1;
+}
+
+/**
+ * Problem answer
+ */
+message Answer{
+  int32 timestamp = 10;
+  bool is_correct = 11;
+  optional google.protobuf.Any your_answer = 12;
+}
+
+/** 
+ * Problem History
+ */
+message OneProblemHistory{
+  int32 problem_id = 1;
+  repeated Answer your_answers = 2;
+}
+
+/**
+ * List of Problem history
+ */
+message ProblemHistory{
+  repeated OneProblemHistory history = 1;
+}
+
+/**
+ * GetProblemsRequest
+ */
+message GetProblemsRequest {
+  string category = 1;
+  optional int32 group_id = 4;
+  int32 problem_number = 2;
+
+  /**
+    * GetProblemOption
+    */
+  enum GetProblemsOption{
+    NO_OPTION = 0;
+    RANDOM = 1;
+    WRONG_ONLY = 2;
+    WRONG_FIRST = 3;
+  }
+  GetProblemsOption option = 3;
+}
+
+/**
+ * Get Problems Reply
+ */
+message GetProblemsReply {
+  int32 problem_number = 3;
+  Problems problems = 1;
+  ProblemHistory history = 2;
+}
+
+/**
+ * post new problems request
+ */
+message UpdateProblemsRequest {
+  /**
+    * Update Problems Type
+    */
+  enum UpdateProblemsType{
+    ADD = 0;
+    UPDATE = 1;
+    REMOVE = 2;
+  }
+
+  UpdateProblemsType type = 5;
+  Problems problems = 1;
+  int32 timestamp = 3;
+}
+
+message UpdateProblemsReply {
+}
+
+/**
+ * result of problem
+ */
+message UpdateProblemHistoryRequest {
+  /**
+    * Update Problem History Option
+    */
+  enum UpdateProblemHistoryOption{
+    NEW = 0;
+    REPRACE = 1;
+  }
+
+  UpdateProblemHistoryOption option = 2;
+  // new problem history
+  ProblemHistory history = 1;
+}
+
+message UpdateProblemHistoryReply {
+}
